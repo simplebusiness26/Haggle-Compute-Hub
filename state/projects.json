@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "id": "animation-factory",
+      "name": "Animation Factory",
+      "repository": "simplebusiness26/Animation-Factory",
+      "families": ["animation", "visual_assets", "model_lab"],
+      "status": "connected-by-design",
+      "notes": "Existing Kaggle bridge proves T4 execution and can supply workloads to the Hub."
+    },
+    {
+      "id": "prize-hunter",
+      "name": "Kaggle Prize Hunter",
+      "repository": "simplebusiness26/Animation-Factory",
+      "families": ["prize_hunter", "model_lab"],
+      "status": "connected-by-design",
+      "notes": "Competition experiments stay approval-gated; Hub can prioritize approved experiments by expected value per GPU minute."
+    },
+    {
+      "id": "tradebooks",
+      "name": "TradeBooks",
+      "repository": "simplebusiness26/TradeBooks",
+      "families": ["document_ai", "fine_tune", "embeddings"],
+      "status": "candidate",
+      "notes": "Potential batch document extraction, transaction classification and specialist-model workloads."
+    },
+    {
+      "id": "games",
+      "name": "Game AI Lab",
+      "repository": "simplebusiness26/DoubleCross",
+      "families": ["game_ai", "model_lab"],
+      "status": "candidate",
+      "notes": "Potential simulation/self-play and NPC evaluation workloads."
+    }
+  ]
+}
