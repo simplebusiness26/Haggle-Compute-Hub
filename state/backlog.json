@@ -1,0 +1,46 @@
+{
+  "ideas": [
+    {
+      "family": "animation",
+      "title": "Benchmark image-to-video throughput on dual T4",
+      "value": 90,
+      "estimated_minutes": 60,
+      "status": "candidate"
+    },
+    {
+      "family": "visual_assets",
+      "title": "Build batch business creative image pipeline",
+      "value": 88,
+      "estimated_minutes": 90,
+      "status": "candidate"
+    },
+    {
+      "family": "model_lab",
+      "title": "Automated T4 model compatibility benchmark",
+      "value": 82,
+      "estimated_minutes": 45,
+      "status": "candidate"
+    },
+    {
+      "family": "fine_tune",
+      "title": "Fine-tuning template for small specialist models",
+      "value": 92,
+      "estimated_minutes": 180,
+      "status": "candidate"
+    },
+    {
+      "family": "document_ai",
+      "title": "Document extraction and classification benchmark",
+      "value": 85,
+      "estimated_minutes": 60,
+      "status": "candidate"
+    },
+    {
+      "family": "game_ai",
+      "title": "Self-play / NPC simulation benchmark",
+      "value": 70,
+      "estimated_minutes": 75,
+      "status": "candidate"
+    }
+  ]
+}
