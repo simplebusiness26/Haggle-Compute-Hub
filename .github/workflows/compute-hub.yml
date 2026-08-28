@@ -60,8 +60,22 @@ jobs:
             echo "path=control/command.json" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Refresh active Kaggle jobs
+        run: python monitor.py
+
+      - name: Guard overlapping accelerator dispatch
+        run: python guard.py "${{ steps.command.outputs.path }}" /tmp/effective-command.json
+
       - name: Run Compute Hub
-        run: python hub.py "${{ steps.command.outputs.path }}"
+        run: python hub.py /tmp/effective-command.json
+
+      - name: Upload collected Kaggle output
+        if: ${{ hashFiles('artifacts/**') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: compute-hub-output-${{ github.run_number }}
+          path: artifacts/
+          retention-days: 7
 
       - name: Publish state
         shell: bash
