@@ -37,10 +37,9 @@ jobs:
           rm -rf _site
           mkdir -p _site/data _site/results
           cp dashboard/index.html _site/index.html
-          cp state/queue.json _site/data/queue.json
-          cp state/resources.json _site/data/resources.json
-          cp state/history.json _site/data/history.json
-          cp state/catalog.json _site/data/catalog.json
+          for f in queue resources history catalog projects backlog system; do
+            if [ -f "state/$f.json" ]; then cp "state/$f.json" "_site/data/$f.json"; fi
+          done
           if [ -f results/latest.md ]; then cp results/latest.md _site/results/latest.md; fi
           touch _site/.nojekyll
 
