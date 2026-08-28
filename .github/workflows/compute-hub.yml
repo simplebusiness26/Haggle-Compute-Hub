@@ -1,0 +1,88 @@
+name: Kaggle Compute Hub
+
+on:
+  push:
+    paths:
+      - 'control/command.json'
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Hub action'
+        required: false
+        default: 'schedule'
+        type: choice
+        options:
+          - schedule
+          - status
+          - idle
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kaggle-compute-hub
+  cancel-in-progress: false
+
+jobs:
+  hub:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      KAGGLE_OWNER: ${{ vars.KAGGLE_OWNER || 'simplebusiness' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Select command
+        id: command
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            printf '{"action":"schedule","request_id":"hourly-%s"}\n' "$(date -u +%Y%m%dT%H%M%SZ)" > /tmp/hub-command.json
+            echo "path=/tmp/hub-command.json" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            printf '{"action":"%s","request_id":"manual-%s"}\n' "${{ inputs.action }}" "$(date -u +%Y%m%dT%H%M%SZ)" > /tmp/hub-command.json
+            echo "path=/tmp/hub-command.json" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=control/command.json" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run Compute Hub
+        run: python hub.py "${{ steps.command.outputs.path }}"
+
+      - name: Publish state
+        shell: bash
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git pull --rebase --autostash origin main
+          git add state/ results/
+          if git diff --cached --quiet; then
+            echo "No state changes to publish."
+            exit 0
+          fi
+
+          git commit -m "Compute Hub state update"
+          for attempt in 1 2 3; do
+            if git push origin main; then
+              exit 0
+            fi
+            echo "Push raced with another commit; rebasing (attempt $attempt)."
+            git pull --rebase origin main
+          done
+          exit 1
