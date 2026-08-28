@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#0b1020" />
+<title>Kaggle Compute Hub</title>
+<style>
+:root{color-scheme:dark;--bg:#070b14;--panel:#101727;--panel2:#151e31;--line:#26324a;--text:#f5f7fb;--muted:#9aa7bd;--good:#49df98;--warn:#ffc857;--bad:#ff6b78;--blue:#6da8ff;--purple:#aa8cff;--radius:22px}*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#15203b 0,#0a0f1c 34%,var(--bg) 70%);color:var(--text);min-height:100vh}.shell{width:min(100%,900px);margin:auto;padding:22px 16px 70px}.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin:10px 2px 22px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--blue);font-weight:800}.top h1{font-size:30px;line-height:1.02;margin:7px 0 8px}.sub{color:var(--muted);font-size:14px;line-height:1.45}.refresh{border:1px solid var(--line);background:#151e31;color:white;border-radius:14px;padding:11px 13px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.metric,.card,.section{background:linear-gradient(180deg,rgba(23,33,55,.94),rgba(14,21,36,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 14px 35px rgba(0,0,0,.18)}.metric{padding:16px}.metric .label{font-size:12px;color:var(--muted);font-weight:700}.metric .value{font-size:24px;font-weight:900;margin-top:6px}.wide{grid-column:1/-1}.bar{height:9px;border-radius:99px;background:#26324a;overflow:hidden;margin-top:13px}.bar>div{height:100%;background:linear-gradient(90deg,var(--good),var(--blue));border-radius:99px}.section{padding:17px;margin-top:14px}.section h2{font-size:17px;margin:0 0 12px}.next{padding:18px;background:linear-gradient(145deg,rgba(53,80,140,.42),rgba(24,31,54,.9));border:1px solid #38517d;border-radius:19px}.next .title{font-size:19px;font-weight:900;margin:5px 0}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.chip{font-size:11px;font-weight:800;padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:#111a2d;color:#cbd4e3}.chip.good{color:var(--good);border-color:#2a6a50}.chip.warn{color:var(--warn);border-color:#745f31}.job{padding:15px 0;border-top:1px solid var(--line)}.job:first-child{border-top:0;padding-top:2px}.jobrow{display:flex;justify-content:space-between;gap:12px}.jobtitle{font-size:15px;font-weight:850}.score{font-weight:900;color:var(--blue);white-space:nowrap}.meta{color:var(--muted);font-size:12px;margin-top:6px;line-height:1.4}.status{display:inline-block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;padding:5px 8px;border-radius:999px;margin-right:5px}.queued{background:#29243a;color:#d9c4ff}.running{background:#173729;color:#78f0ad}.completed{background:#193248;color:#87c8ff}.failed,.cancelled{background:#44212a;color:#ffadb5}.event{display:grid;grid-template-columns:82px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:12px}.event:first-child{border-top:0}.eventtime{color:var(--muted)}.empty{color:var(--muted);font-size:13px;padding:12px 0}.footer{color:#69778f;font-size:11px;text-align:center;margin-top:24px}.error{padding:15px;border:1px solid #703944;background:#351c25;border-radius:16px;color:#ffb4bb}.family{font-size:12px;color:var(--purple);font-weight:800}@media(min-width:700px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.wide{grid-column:span 2}.shell{padding-top:34px}.top h1{font-size:38px}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="top">
+    <div><div class="eyebrow">Free compute control plane</div><h1>Kaggle Compute Hub</h1><div class="sub">Value-first scheduling across GPU, TPU and CPU workloads.</div></div>
+    <button class="refresh" onclick="loadAll()">Refresh</button>
+  </header>
+  <div id="error"></div>
+  <section class="grid" id="metrics"></section>
+  <section class="section"><h2>Next best job</h2><div id="next"></div></section>
+  <section class="section"><h2>Queue & active work</h2><div id="jobs"></div></section>
+  <section class="section"><h2>Recent activity</h2><div id="events"></div></section>
+  <section class="section"><h2>Compute factories</h2><div id="families"></div></section>
+  <div class="footer" id="updated">Loading live repository state…</div>
+</main>
+<script>
+const priorityWeights={low:.75,normal:1,high:1.5,urgent:2};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function urgency(job){if(!job.deadline)return 1;const h=(new Date(job.deadline)-Date.now())/36e5;if(h<=0)return .25;if(h<=24)return 2;if(h<=72)return 1.5;if(h<=168)return 1.2;return 1}
+function score(job){return ((Number(job.value||0)/Math.max(5,Number(job.estimated_minutes||30)))*(priorityWeights[job.priority]||1)*urgency(job)*20)}
+function formatHours(n){return `${Number(n||0).toFixed(1)}h`}
+function statusChip(s){return `<span class="status ${esc(s)}">${esc(s)}</span>`}
+async function j(path){const r=await fetch(path+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error(`${path}: HTTP ${r.status}`);return r.json()}
+async function loadAll(){document.getElementById('error').innerHTML='';try{const [q,r,h,c]=await Promise.all([j('data/queue.json'),j('data/resources.json'),j('data/history.json'),j('data/catalog.json')]);render(q,r,h,c)}catch(e){document.getElementById('error').innerHTML=`<div class="error">Could not load live hub data: ${esc(e.message)}</div>`}}
+function render(q,r,h,c){const jobs=q.jobs||[];const queued=jobs.filter(x=>x.status==='queued').map(x=>({...x,_score:score(x)})).sort((a,b)=>b._score-a._score);const active=jobs.filter(x=>['dispatching','running'].includes(x.status));const completed=jobs.filter(x=>x.status==='completed');const total=Number(r.configured_gpu_hours_per_week||30),used=Number(r.estimated_gpu_hours_used||0),reserve=total*Number(r.reserve_fraction||0),unreserved=Math.max(0,total-used-reserve);const pct=Math.min(100,total?used/total*100:0);
+ document.getElementById('metrics').innerHTML=`
+ <div class="metric wide"><div class="label">Weekly GPU budget</div><div class="value">${formatHours(used)} / ${formatHours(total)}</div><div class="bar"><div style="width:${pct}%"></div></div></div>
+ <div class="metric"><div class="label">Unreserved left</div><div class="value">${formatHours(unreserved)}</div></div>
+ <div class="metric"><div class="label">Active</div><div class="value">${active.length}</div></div>
+ <div class="metric"><div class="label">Queued</div><div class="value">${queued.length}</div></div>
+ <div class="metric"><div class="label">Completed</div><div class="value">${completed.length}</div></div>`;
+ const n=queued[0];document.getElementById('next').innerHTML=n?`<div class="next"><div class="family">${esc((c.families?.[n.family]||{}).label||n.family)}</div><div class="title">${esc(n.title)}</div><div class="sub">The scheduler currently ranks this highest by expected value, urgency, priority and estimated compute.</div><div class="chips"><span class="chip good">Score ${n._score.toFixed(1)}</span><span class="chip">Value ${esc(n.value)}/100</span><span class="chip">${esc(n.estimated_minutes)} min</span><span class="chip">${esc(n.compute.toUpperCase())}</span><span class="chip">${esc(n.priority)}</span></div></div>`:`<div class="empty">Nothing is waiting for compute.</div>`;
+ const ordered=[...active,...queued,...jobs.filter(x=>!['dispatching','running','queued'].includes(x.status)).slice(-8).reverse()];document.getElementById('jobs').innerHTML=ordered.length?ordered.map(x=>`<div class="job"><div class="jobrow"><div><div class="jobtitle">${statusChip(x.status)}${esc(x.title)}</div><div class="meta">${esc((c.families?.[x.family]||{}).label||x.family)} · ${esc(x.compute)} · ${esc(x.estimated_minutes)} min${x.kaggle_ref?' · '+esc(x.kaggle_ref):''}</div></div><div class="score">${x.status==='queued'?score(x).toFixed(1):esc(x.value)+'/100'}</div></div>${x.last_error?`<div class="meta">⚠ ${esc(x.last_error)}</div>`:''}</div>`).join(''):`<div class="empty">No jobs yet. Add one from chat and it will appear here.</div>`;
+ const events=(h.events||[]).slice(0,12);document.getElementById('events').innerHTML=events.length?events.map(e=>`<div class="event"><div class="eventtime">${new Date(e.at).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div><div><b>${esc(e.kind)}</b>${e.title?' · '+esc(e.title):''}${e.message?' · '+esc(e.message):''}</div></div>`).join(''):`<div class="empty">No activity recorded yet.</div>`;
+ const families=Object.entries(c.families||{});document.getElementById('families').innerHTML=families.map(([k,v])=>`<div class="job"><div class="jobrow"><div><div class="jobtitle">${esc(v.label)}</div><div class="meta">${esc(v.description)}</div></div><span class="chip">${esc(v.default_compute)}</span></div></div>`).join('');document.getElementById('updated').textContent=`Live state loaded ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`}
+loadAll();
+</script>
+</body>
+</html>
