@@ -1,0 +1,76 @@
+{
+  "families": {
+    "animation": {
+      "label": "Animation Factory",
+      "default_compute": "gpu",
+      "default_value": 85,
+      "description": "Image-to-video, motion generation and animation rendering."
+    },
+    "visual_assets": {
+      "label": "Visual Asset Factory",
+      "default_compute": "gpu",
+      "default_value": 80,
+      "description": "Image generation, cleanup, background removal and upscaling."
+    },
+    "model_lab": {
+      "label": "Model Lab",
+      "default_compute": "gpu",
+      "default_value": 75,
+      "description": "Benchmark new open models for speed, VRAM and output quality."
+    },
+    "fine_tune": {
+      "label": "Fine-Tune Factory",
+      "default_compute": "gpu",
+      "default_value": 90,
+      "description": "LoRA and small specialist model fine-tuning."
+    },
+    "document_ai": {
+      "label": "Document AI",
+      "default_compute": "gpu",
+      "default_value": 85,
+      "description": "Batch extraction, classification and document vision."
+    },
+    "media": {
+      "label": "Media Factory",
+      "default_compute": "gpu",
+      "default_value": 70,
+      "description": "Transcription, captions, audio/video analysis and clip processing."
+    },
+    "embeddings": {
+      "label": "Embedding Factory",
+      "default_compute": "gpu",
+      "default_value": 70,
+      "description": "Large-scale embedding and RAG preprocessing batches."
+    },
+    "dataset": {
+      "label": "Dataset Factory",
+      "default_compute": "cpu",
+      "default_value": 65,
+      "description": "Cleaning, enrichment, labelling and dataset packaging."
+    },
+    "game_ai": {
+      "label": "Game AI Lab",
+      "default_compute": "gpu",
+      "default_value": 70,
+      "description": "Self-play, simulation and trained NPC experiments."
+    },
+    "prize_hunter": {
+      "label": "Prize Hunter Experiments",
+      "default_compute": "gpu",
+      "default_value": 95,
+      "description": "Approved Kaggle competition experiments with measurable upside."
+    },
+    "cpu_utility": {
+      "label": "CPU Utility",
+      "default_compute": "cpu",
+      "default_value": 50,
+      "description": "Preparation, packaging and QA that should not consume GPU quota."
+    }
+  },
+  "priorities": {
+    "low": 0.75,
+    "normal": 1.0,
+    "high": 1.5,
+    "urgent": 2.0
+  }
+}
