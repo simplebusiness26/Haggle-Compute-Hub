@@ -1,0 +1,25 @@
+{
+  "week_started_utc": null,
+  "configured_gpu_hours_per_week": 30.0,
+  "estimated_gpu_hours_used": 0.0,
+  "reserve_fraction": 0.2,
+  "active_kaggle_jobs": [],
+  "resources": {
+    "cpu": {
+      "enabled": true,
+      "costs_gpu_quota": false
+    },
+    "gpu": {
+      "enabled": true,
+      "accelerator": "NvidiaTeslaT4",
+      "devices_expected": 2,
+      "vram_gb_each": 15,
+      "max_session_hours": 12
+    },
+    "tpu": {
+      "enabled": true,
+      "accelerator": "TpuV38",
+      "experimental": true
+    }
+  }
+}
